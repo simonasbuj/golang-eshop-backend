@@ -3,6 +3,7 @@ package handlers
 import (
 	"golang-eshop-backend/internal/api/rest"
 	"golang-eshop-backend/internal/dto"
+	"golang-eshop-backend/internal/helpers/logging"
 	"golang-eshop-backend/internal/services"
 	"net/http"
 
@@ -11,16 +12,24 @@ import (
 )
 
 type UserHandler struct {
-	s services.UserService
+	s 		services.UserService
+	logger 	*zerolog.Logger
+}
+
+func newUserHandler(service services.UserService, logger *zerolog.Logger) *UserHandler {
+	l := logger.With().Str("class", "UserHandler").Logger()
+	
+	return &UserHandler{
+		s: service,
+		logger: &l,
+	}
 }
 
 func SetupUserRoutes(rh *rest.RestHandler, logger *zerolog.Logger) {
 	app := rh.App
 
 	userService := services.NewUserService(logger)
-	h := UserHandler{
-		s: userService,
-	}
+	h := newUserHandler(userService, logger)
 
 	// public endpoints
 	app.Post("/auth/signup", h.SignUp)
@@ -43,12 +52,16 @@ func SetupUserRoutes(rh *rest.RestHandler, logger *zerolog.Logger) {
 
 
 func (h *UserHandler) SignUp(ctx *fiber.Ctx) error {
+	logging.LogInfo(h.logger, ctx, "singup handler triggered")
+
 	// try to create user from passed json
 	user := dto.UserSignUp{}
 	err := ctx.BodyParser(&user)
 	if err != nil {
+		errorMsg := "invalid user input provided"
+		logging.LogError(h.logger, ctx, err, errorMsg)
 		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"error": "invalid user input provided",
+			"error": errorMsg,
 		})
 	}
 
@@ -59,6 +72,7 @@ func (h *UserHandler) SignUp(ctx *fiber.Ctx) error {
 		})
 	}
 
+	logging.LogInfo(h.logger, ctx, "singup handler finished succesfully")
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "new user signed up successfully",
 		"token": token,
