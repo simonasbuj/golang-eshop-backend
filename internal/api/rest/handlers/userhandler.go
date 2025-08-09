@@ -2,18 +2,25 @@ package handlers
 
 import (
 	"golang-eshop-backend/internal/api/rest"
+	"golang-eshop-backend/internal/dto"
+	"golang-eshop-backend/internal/services"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog"
 )
 
 type UserHandler struct {
-	// TODO pass UserService
+	s services.UserService
 }
 
-func SetupUserRoutes(rh *rest.RestHandler) {
+func SetupUserRoutes(rh *rest.RestHandler, logger *zerolog.Logger) {
 	app := rh.App
-	h := UserHandler{}
+
+	userService := services.NewUserService(logger)
+	h := UserHandler{
+		s: userService,
+	}
 
 	// public endpoints
 	app.Post("/auth/signup", h.SignUp)
@@ -22,8 +29,9 @@ func SetupUserRoutes(rh *rest.RestHandler) {
 	// private endpoints
 	app.Get("/auth/verify", h.Verify)
 	app.Post("/auth/verify", h.GetVerificationCode)
-	app.Get("/auth/profile", h.GetProfile)
-	app.Post("/auth/profile", h.CreateProfile)
+
+	app.Get("/user/profile", h.GetProfile)
+	app.Post("/user/profile", h.UpdateProfile)
 
 	app.Get("/cart", h.GetCart)
 	app.Post("/cart", h.AddToCart)
@@ -35,8 +43,25 @@ func SetupUserRoutes(rh *rest.RestHandler) {
 
 
 func (h *UserHandler) SignUp(ctx *fiber.Ctx) error {
+	// try to create user from passed json
+	user := dto.UserSignUp{}
+	err := ctx.BodyParser(&user)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"error": "invalid user input provided",
+		})
+	}
+
+	token, err := h.s.SignUp(ctx, user)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"error": "error during signup",
+		})
+	}
+
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "sing up",
+		"message": "new user signed up successfully",
+		"token": token,
 	})
 }
 
@@ -64,7 +89,7 @@ func (h *UserHandler) GetProfile(ctx *fiber.Ctx) error {
 	})
 }
 
-func (h *UserHandler) CreateProfile(ctx *fiber.Ctx) error {
+func (h *UserHandler) UpdateProfile(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "creating profile",
 	})
