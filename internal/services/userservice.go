@@ -3,6 +3,7 @@ package services
 import (
 	"golang-eshop-backend/internal/dto"
 	"golang-eshop-backend/internal/models"
+	"golang-eshop-backend/internal/helpers/logging"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
@@ -15,19 +16,19 @@ type UserService struct {
 }
 
 func NewUserService(logger *zerolog.Logger) UserService {
+	l := logger.With().Str("class", "UserService").Logger()
 	return UserService{
-		logger: logger,
+		logger: &l,
 	}
 }
-
 
 func (s *UserService) FindUserByEmail(email string) (*models.User, error) {
 	return &models.User{}, nil
 }
 
 func (s *UserService) SignUp(ctx *fiber.Ctx, input dto.UserSignUp) (string, error) {
-	s.logger.Info().Msg("new user created succesfully")
-	return "", nil
+	logging.LogInfo(s.logger, ctx, "new user created succesfully")
+	return "my-token", nil
 }
 
 func (s *UserService) SignIn(input any) (string, error) {

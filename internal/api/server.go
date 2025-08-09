@@ -7,7 +7,7 @@ import (
 	"golang-eshop-backend/internal/api/rest"
 	"golang-eshop-backend/internal/api/rest/handlers"
 	"golang-eshop-backend/internal/api/rest/middleware"
-	"golang-eshop-backend/internal/helpers"
+	"golang-eshop-backend/internal/helpers/logging"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -22,7 +22,7 @@ func StartServer(cfg configs.AppConfig, myLogger *zerolog.Logger) {
 	// make fiber use our logger for requests logging
 	app.Use(logger.New(logger.Config{
 		Format: "ip=${ip} method=${method} path=${path} status=${status}",
-		Output: helpers.LoggerWriter{Log: myLogger},
+		Output: logging.LoggerWriter{Log: myLogger},
 	}))
 
 	// add correlation_id to context for each request
