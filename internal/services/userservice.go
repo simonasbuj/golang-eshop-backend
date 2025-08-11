@@ -11,15 +11,10 @@ import (
 )
 
 
-type UserService struct {
-	logger *zerolog.Logger
-}
+type UserService struct {}
 
 func NewUserService(logger *zerolog.Logger) UserService {
-	l := logger.With().Str("class", "UserService").Logger()
-	return UserService{
-		logger: &l,
-	}
+	return UserService{}
 }
 
 func (s *UserService) FindUserByEmail(email string) (*models.User, error) {
@@ -27,7 +22,9 @@ func (s *UserService) FindUserByEmail(email string) (*models.User, error) {
 }
 
 func (s *UserService) SignUp(ctx *fiber.Ctx, input dto.UserSignUp) (string, error) {
-	logging.LogInfo(s.logger, ctx, "new user created succesfully")
+	l2 := logging.GetLoggerFromCtx(ctx)
+	l2.Info().Msg("new user created successfully")
+	
 	return "my-token", nil
 }
 
