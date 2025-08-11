@@ -3,13 +3,14 @@ package handlers
 import (
 	"golang-eshop-backend/internal/api/rest"
 	"golang-eshop-backend/internal/dto"
-	"golang-eshop-backend/internal/helpers/logging"
+	"golang-eshop-backend/internal/api/rest/helpers/logging"
 	"golang-eshop-backend/internal/services"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 )
+
 
 type UserHandler struct {
 	s 		services.UserService
@@ -50,31 +51,30 @@ func SetupUserRoutes(rh *rest.RestHandler, logger *zerolog.Logger) {
 	app.Post("/become-seller", h.SignIn)
 }
 
+func handleError(ctx *fiber.Ctx, logger *zerolog.Logger, status int, errorMsg string, err error) error {
+	logger.Error().Err(err).Msg(errorMsg)
+	return ctx.Status(status).JSON(&fiber.Map{
+		"error": errorMsg,
+	})
+}
 
 func (h *UserHandler) SignUp(ctx *fiber.Ctx) error {
-	logging.LogInfo(h.logger, ctx, "singup handler triggered")
 	logger := logging.GetLoggerFromCtx(ctx)
-	logger.Info().Msg("does this finally work?")
+	logger.Info().Msg("singup handler triggered")
 	
 	// try to create user from passed json
 	user := dto.UserSignUp{}
 	err := ctx.BodyParser(&user)
 	if err != nil {
-		errorMsg := "invalid user input provided"
-		logging.LogError(h.logger, ctx, err, errorMsg)
-		return ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"error": errorMsg,
-		})
+		return handleError(ctx, logger, http.StatusBadRequest, "invalid user input provided", err)
 	}
 
 	token, err := h.s.SignUp(ctx, user)
 	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
-			"error": "error during signup",
-		})
+		return handleError(ctx, logger, http.StatusInternalServerError, "error during signup", err)
 	}
 
-	logging.LogInfo(h.logger, ctx, "singup handler finished succesfully")
+	logger.Info().Msg("singup handler finished succesfully")
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "new user signed up successfully",
 		"token": token,

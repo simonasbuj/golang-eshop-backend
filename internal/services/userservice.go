@@ -3,7 +3,7 @@ package services
 import (
 	"golang-eshop-backend/internal/dto"
 	"golang-eshop-backend/internal/models"
-	"golang-eshop-backend/internal/helpers/logging"
+	"golang-eshop-backend/internal/api/rest/helpers/logging"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
