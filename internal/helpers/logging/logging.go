@@ -36,9 +36,9 @@ func (lw LoggerWriter) Write(p []byte) (n int, err error) {
 
 func putCtxValuesIntoLogger(logger *zerolog.Logger, ctx *fiber.Ctx) *zerolog.Logger {
 
-    corrId := middleware.CorrelationIDKey
+    corrID := string(middleware.CorrelationIDKey)
 
-    l := logger.With().Str(corrId, getCtxValue(ctx, corrId)).Logger()
+    l := logger.With().Str(corrID, getCtxValue(ctx, corrID)).Logger()
     return &l
 }
 
@@ -57,4 +57,9 @@ func LogInfo(logger *zerolog.Logger, ctx *fiber.Ctx, msg string) {
 func LogError(logger *zerolog.Logger, ctx *fiber.Ctx, err error, msg string) {
     l := putCtxValuesIntoLogger(logger, ctx)
     l.Error().Err(err).Msg(msg)
+}
+
+func GetLoggerFromCtx(c *fiber.Ctx) *zerolog.Logger {
+    logger := c.Locals("logger").(*zerolog.Logger)
+    return logger
 }

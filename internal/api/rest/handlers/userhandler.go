@@ -53,7 +53,9 @@ func SetupUserRoutes(rh *rest.RestHandler, logger *zerolog.Logger) {
 
 func (h *UserHandler) SignUp(ctx *fiber.Ctx) error {
 	logging.LogInfo(h.logger, ctx, "singup handler triggered")
-
+	logger := logging.GetLoggerFromCtx(ctx)
+	logger.Info().Msg("does this finally work?")
+	
 	// try to create user from passed json
 	user := dto.UserSignUp{}
 	err := ctx.BodyParser(&user)

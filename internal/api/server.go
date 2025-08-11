@@ -26,7 +26,7 @@ func StartServer(cfg configs.AppConfig, myLogger *zerolog.Logger) {
 	}))
 
 	// add correlation_id to context for each request
-	app.Use(middleware.CorrelationIDMiddleware())
+	app.Use(middleware.LoggerMiddleware())
 
 
 	// register routes
