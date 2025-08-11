@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 
@@ -14,9 +13,8 @@ import (
 
 func TestUserService_SignUp(t *testing.T) {
 	// inti variables
-    logger := zerolog.Nop()
 
-    userService := services.NewUserService(&logger)
+    userService := services.NewUserService()
 
 	app := fiber.New()
 	mockCtx := app.AcquireCtx(&fasthttp.RequestCtx{})

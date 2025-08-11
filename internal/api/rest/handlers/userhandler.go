@@ -17,20 +17,17 @@ type UserHandler struct {
 	logger 	*zerolog.Logger
 }
 
-func newUserHandler(service services.UserService, logger *zerolog.Logger) *UserHandler {
-	l := logger.With().Str("class", "UserHandler").Logger()
-	
+func newUserHandler(service services.UserService) *UserHandler {
 	return &UserHandler{
 		s: service,
-		logger: &l,
 	}
 }
 
-func SetupUserRoutes(rh *rest.RestHandler, logger *zerolog.Logger) {
+func SetupUserRoutes(rh *rest.RestHandler) {
 	app := rh.App
 
-	userService := services.NewUserService(logger)
-	h := newUserHandler(userService, logger)
+	userService := services.NewUserService()
+	h := newUserHandler(userService)
 
 	// public endpoints
 	app.Post("/auth/signup", h.SignUp)

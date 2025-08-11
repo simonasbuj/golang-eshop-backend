@@ -9,10 +9,9 @@ import (
 	"golang-eshop-backend/internal/api/rest/middleware"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog"
 )
 
-func StartServer(cfg configs.AppConfig, myLogger *zerolog.Logger) {
+func StartServer(cfg configs.AppConfig) {
 	app := fiber.New()
 
 	// register middleware
@@ -22,7 +21,7 @@ func StartServer(cfg configs.AppConfig, myLogger *zerolog.Logger) {
 
 	// register routes
 	rh := &rest.RestHandler{App: app}
-	setupRoutes(rh, myLogger)
+	setupRoutes(rh)
 
 	// health and readiness route
 	app.Get("/health", healthCheck)
@@ -31,8 +30,8 @@ func StartServer(cfg configs.AppConfig, myLogger *zerolog.Logger) {
 	app.Listen(cfg.ServerPort)
 }
 
-func setupRoutes(rh *rest.RestHandler, logger *zerolog.Logger) {
-	handlers.SetupUserRoutes(rh, logger)
+func setupRoutes(rh *rest.RestHandler) {
+	handlers.SetupUserRoutes(rh)
 }
 
 func healthCheck(ctx *fiber.Ctx) error {

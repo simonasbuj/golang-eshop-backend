@@ -5,8 +5,8 @@ import (
 
     "github.com/gofiber/fiber/v2"
     "github.com/google/uuid"
-    "github.com/rs/zerolog/log"
     "github.com/rs/zerolog"
+    "github.com/rs/zerolog/log"
 )
 
 
@@ -21,7 +21,9 @@ func LoggerWithCommonValuesMiddleware() fiber.Handler {
     return func(c *fiber.Ctx) error {
 		correlationID := uuid.New().String()
 
-        logger := log.With().Str(string(CorrelationIDKey), correlationID).Logger()
+        logger := log.With().
+            Str(string(CorrelationIDKey), correlationID).
+            Logger()
 
         c.Locals("logger", &logger)
         

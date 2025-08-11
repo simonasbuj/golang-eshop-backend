@@ -6,14 +6,13 @@ import (
 	"golang-eshop-backend/internal/api/rest/helpers/logging"
 
 	"github.com/google/uuid"
-	"github.com/rs/zerolog"
 	"github.com/gofiber/fiber/v2"
 )
 
 
 type UserService struct {}
 
-func NewUserService(logger *zerolog.Logger) UserService {
+func NewUserService() UserService {
 	return UserService{}
 }
 
@@ -22,8 +21,8 @@ func (s *UserService) FindUserByEmail(email string) (*models.User, error) {
 }
 
 func (s *UserService) SignUp(ctx *fiber.Ctx, input dto.UserSignUp) (string, error) {
-	l2 := logging.GetLoggerFromCtx(ctx)
-	l2.Info().Msg("new user created successfully")
+	logger := logging.GetLoggerFromCtx(ctx)
+	logger.Info().Msg("new user created successfully")
 	
 	return "my-token", nil
 }

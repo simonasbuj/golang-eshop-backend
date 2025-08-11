@@ -23,5 +23,5 @@ func main() {
 
 	// start server
 	logger.Info().Msg("Starting server...")
-	api.StartServer(cfg, &logger)
+	api.StartServer(cfg)
 }
