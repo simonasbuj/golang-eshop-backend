@@ -8,13 +8,22 @@ import (
 	"github.com/valyala/fasthttp"
 
 	"golang-eshop-backend/internal/dto"
+	"golang-eshop-backend/internal/models"
 	"golang-eshop-backend/internal/services"
 )
+
+// mock dependencies
+type mockUserRepository struct {}
+
+func (r *mockUserRepository) CreateUser(ctx *fiber.Ctx, user *models.User) (*models.User, error) {
+	return user, nil
+}
 
 func TestUserService_SignUp(t *testing.T) {
 	// inti variables
 
-    userService := services.NewUserService()
+    r := &mockUserRepository{}
+    userService := services.NewUserService(r)
 
 	app := fiber.New()
 	mockCtx := app.AcquireCtx(&fasthttp.RequestCtx{})
