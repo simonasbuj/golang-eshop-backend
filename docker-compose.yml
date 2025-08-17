@@ -1,0 +1,19 @@
+
+services:
+  postgres:
+    image:  postgres:17.6
+    container_name: postgres-golang-eshop
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: eshop
+      TZ: UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+    driver: local

@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"golang-eshop-backend/internal/api/rest"
-	"golang-eshop-backend/internal/dto"
 	"golang-eshop-backend/internal/api/rest/helpers/logging"
+	"golang-eshop-backend/internal/dto"
+	"golang-eshop-backend/internal/repository"
 	"golang-eshop-backend/internal/services"
 	"net/http"
 
@@ -26,7 +27,9 @@ func newUserHandler(service services.UserService) *UserHandler {
 func SetupUserRoutes(rh *rest.RestHandler) {
 	app := rh.App
 
-	userService := services.NewUserService()
+	userRepository := repository.NewUserRepository(rh.DB)
+
+	userService := services.NewUserService(userRepository)
 	h := newUserHandler(userService)
 
 	// public endpoints

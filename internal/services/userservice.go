@@ -1,19 +1,23 @@
 package services
 
 import (
+	"golang-eshop-backend/internal/api/rest/helpers/logging"
 	"golang-eshop-backend/internal/dto"
 	"golang-eshop-backend/internal/models"
-	"golang-eshop-backend/internal/api/rest/helpers/logging"
+	"golang-eshop-backend/internal/repository"
 
-	"github.com/google/uuid"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
+type UserService struct{
+	repo repository.UserRepository
+}
 
-type UserService struct {}
-
-func NewUserService() UserService {
-	return UserService{}
+func NewUserService(repo repository.UserRepository) UserService {
+	return UserService{
+		repo: repo,
+	}
 }
 
 func (s *UserService) FindUserByEmail(email string) (*models.User, error) {
@@ -21,10 +25,22 @@ func (s *UserService) FindUserByEmail(email string) (*models.User, error) {
 }
 
 func (s *UserService) SignUp(ctx *fiber.Ctx, input dto.UserSignUp) (string, error) {
-	logger := logging.GetLoggerFromCtx(ctx)
-	logger.Info().Msg("new user created successfully")
-	
-	return "my-token", nil
+	logger := logging.GetLoggerFromCtx(ctx).With().Str("email", input.Email).Logger()
+	logger.Info().Msgf("starting user signup process")
+
+	_, err := s.repo.CreateUser(ctx, &models.User{
+		Email: input.Email,
+		Password: input.Password,
+		Phone: input.Phone,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	// generate token
+	token := "my-token" 
+	logger.Info().Msgf("new user created successfully")
+	return token, nil
 }
 
 func (s *UserService) SignIn(input any) (string, error) {
