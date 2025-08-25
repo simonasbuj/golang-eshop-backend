@@ -1,7 +1,7 @@
 
 
 run-api:
-	@APP_ENV=local go run cmd/rest/main.go
+	@APP_ENV=local SERVER_PORT=42069 go run cmd/rest/main.go
 
 run-server-with-watch:
 	nodemon --watch './**/*.go' --signal SIGTERM --exec "APP_ENV=local go run cmd/rest/main.go"

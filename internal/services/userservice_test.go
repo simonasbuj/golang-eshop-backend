@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 
@@ -18,6 +19,20 @@ type mockUserRepository struct {}
 func (r *mockUserRepository) CreateUser(ctx *fiber.Ctx, user *models.User) (*models.User, error) {
 	return user, nil
 }
+
+func (r *mockUserRepository) FindUserByEmail(ctx *fiber.Ctx, email string) (*models.User, error) {
+	return &models.User{}, nil
+}
+
+func (r *mockUserRepository) FindUserById(ctx *fiber.Ctx, id uuid.UUID) (*models.User, error) {
+	return &models.User{}, nil
+}
+
+func (r *mockUserRepository) UpdateUser(id uuid.UUID, u *models.User) (*models.User, error) {
+	return &models.User{}, nil
+}
+
+	
 
 func TestUserService_SignUp(t *testing.T) {
 	// inti variables

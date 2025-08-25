@@ -4,11 +4,13 @@ import (
 	"golang-eshop-backend/internal/api/rest"
 	"golang-eshop-backend/internal/api/rest/helpers/logging"
 	"golang-eshop-backend/internal/dto"
+	"golang-eshop-backend/internal/models"
 	"golang-eshop-backend/internal/repository"
 	"golang-eshop-backend/internal/services"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
 
@@ -60,7 +62,7 @@ func handleError(ctx *fiber.Ctx, logger *zerolog.Logger, status int, errorMsg st
 
 func (h *UserHandler) SignUp(ctx *fiber.Ctx) error {
 	logger := logging.GetLoggerFromCtx(ctx)
-	logger.Info().Msg("singup handler triggered")
+	logger.Info().Msg("singup triggered")
 	
 	// try to create user from passed json
 	user := dto.UserSignUp{}
@@ -74,7 +76,7 @@ func (h *UserHandler) SignUp(ctx *fiber.Ctx) error {
 		return handleError(ctx, logger, http.StatusInternalServerError, "error during signup", err)
 	}
 
-	logger.Info().Msg("singup handler finished succesfully")
+	logger.Info().Msg("singup finished succesfully")
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "new user signed up successfully",
 		"token": token,
@@ -82,8 +84,25 @@ func (h *UserHandler) SignUp(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) SignIn(ctx *fiber.Ctx) error {
+	logger := logging.GetLoggerFromCtx(ctx)
+	logger.Info().Msg("signin triggered")
+
+	signInInput := dto.UserSignIn{}
+	err := ctx.BodyParser(&signInInput)
+	if err != nil {
+		return handleError(ctx, logger, http.StatusBadRequest, "bad siging input", err)
+	}
+
+	token, err := h.s.SignIn(ctx, signInInput.Email, signInInput.Password)
+	if err != nil {
+		return handleError(ctx, logger, http.StatusUnauthorized, "failed to sign in", err)
+	}
+
+
+	logger.Info().Msg("singin finished succesfully")
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "sing in",
+		"message": "singed in successfully",
+		"token": token,
 	})
 }
 
@@ -106,8 +125,16 @@ func (h *UserHandler) GetProfile(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) UpdateProfile(ctx *fiber.Ctx) error {
+	logger := logging.GetLoggerFromCtx(ctx)
+	logger.Info().Msg("update profile triggered")
+
+	_, err := h.s.UpdateProfile(ctx, uuid.MustParse("57658614-bbab-410c-b355-3bf70e8d759c"), &models.User{})
+	if err != nil {
+		return handleError(ctx, logger, http.StatusInternalServerError, "failed to update profile", err)
+	}
+	
 	return ctx.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "creating profile",
+		"message": "profile updated",
 	})
 }
 
