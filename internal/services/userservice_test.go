@@ -41,7 +41,7 @@ func (r *mockUserRepository) UpdateUser(id uuid.UUID, u *models.User) (*models.U
 	
 
 func TestUserService_SignUp(t *testing.T) {
-	// inti variables
+	// init variables
 
     r := &mockUserRepository{}
     userService := services.NewUserService(r)
@@ -67,7 +67,7 @@ func TestUserService_SignUp(t *testing.T) {
 }
 
 func TestUserService_SignIn(t *testing.T) {
-	// inti variables
+	// init variables
 
     r := &mockUserRepository{}
     userService := services.NewUserService(r)
