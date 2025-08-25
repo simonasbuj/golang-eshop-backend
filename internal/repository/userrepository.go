@@ -1,15 +1,21 @@
 package repository
 
 import (
+	"errors"
 	"golang-eshop-backend/internal/api/rest/helpers/logging"
 	"golang-eshop-backend/internal/models"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type UserRepository interface {
 	CreateUser(ctx *fiber.Ctx, user *models.User) (*models.User, error)
+	FindUserByEmail(ctx *fiber.Ctx, email string) (*models.User, error)
+	FindUserById(ctx *fiber.Ctx, id uuid.UUID) (*models.User, error)
+	UpdateUser(id uuid.UUID, u *models.User) (*models.User, error)
 }
 
 type userRepository struct {
@@ -32,4 +38,37 @@ func (r *userRepository) CreateUser(ctx *fiber.Ctx, user *models.User) (*models.
 	}
 
 	return user, nil
+}
+
+func (r *userRepository) FindUserByEmail(ctx *fiber.Ctx, email string) (*models.User, error) {
+	var user models.User
+
+	err := r.db.First(&user, "email=?", email).Error
+	if err != nil {
+		return &models.User{}, errors.New("user does not exist")
+	}
+
+	return &user, nil
+}
+
+func (r *userRepository) FindUserById(ctx *fiber.Ctx, id uuid.UUID) (*models.User, error) {
+	var user models.User
+
+	err := r.db.First(&user, id).Error
+	if err != nil {
+		return &models.User{}, errors.New("user does not exist")
+	}
+
+	return &user, nil
+}
+
+func (r *userRepository) UpdateUser(id uuid.UUID, u *models.User) (*models.User, error) {
+	var user models.User
+
+	err := r.db.Model(&user).Clauses(clause.Returning{}).Where("id=?", id).Updates(u).Error
+	if err != nil {
+		return &models.User{}, errors.New("failed to update user")
+	}
+
+	return &user, nil
 }
