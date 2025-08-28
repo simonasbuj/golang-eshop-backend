@@ -34,7 +34,7 @@ APP_ENV=local go run cmd/rest/main.go
 ## GORM
 
 **Pros:**
-- To come
+- Easy to use
 
 **Cons:**
 - To come
