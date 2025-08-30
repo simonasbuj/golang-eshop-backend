@@ -35,10 +35,10 @@ func (a *Auth) GenerateToken(id uuid.UUID, email string, role string) (string, e
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": 		id,
-		"email":   		email,
-		"role":    		role,
-		"expires_at":	time.Now().Add(time.Hour * 24 * 30),
+		"user_id":    id,
+		"email":      email,
+		"role":       role,
+		"expires_at": time.Now().Add(time.Hour * 24 * 30),
 	})
 
 	tokenStr, err := token.SignedString([]byte(a.Secret))
@@ -46,7 +46,7 @@ func (a *Auth) GenerateToken(id uuid.UUID, email string, role string) (string, e
 		return "", err
 	}
 
-	return tokenStr., nil
+	return tokenStr, nil
 }
 
 func (a *Auth) VerifyPassword(plainPassword string, hashedPassword string) error {
