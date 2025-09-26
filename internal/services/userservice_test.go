@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 
@@ -19,8 +20,28 @@ func (r *mockUserRepository) CreateUser(ctx *fiber.Ctx, user *models.User) (*mod
 	return user, nil
 }
 
+func (r *mockUserRepository) FindUserByEmail(ctx *fiber.Ctx, email string) (*models.User, error) {
+	return &models.User{
+		Email: "fake@email.com",
+		Password: "my-password",
+	}, nil
+}
+
+func (r *mockUserRepository) FindUserById(ctx *fiber.Ctx, id uuid.UUID) (*models.User, error) {
+	return &models.User{
+		Email: "fake@email.com",
+		Password: "my-password",
+	}, nil
+}
+
+func (r *mockUserRepository) UpdateUser(id uuid.UUID, u *models.User) (*models.User, error) {
+	return &models.User{}, nil
+}
+
+	
+
 func TestUserService_SignUp(t *testing.T) {
-	// inti variables
+	// init variables
 
     r := &mockUserRepository{}
     userService := services.NewUserService(r)
@@ -43,4 +64,21 @@ func TestUserService_SignUp(t *testing.T) {
 	// assertions
     assert.NoError(t, err)
     assert.Equal(t, "my-token", token)
+}
+
+func TestUserService_SignIn(t *testing.T) {
+	// init variables
+
+    r := &mockUserRepository{}
+    userService := services.NewUserService(r)
+
+	app := fiber.New()
+	mockCtx := app.AcquireCtx(&fasthttp.RequestCtx{})
+
+	// call function
+    token, err := userService.SignIn(mockCtx, "fake@email.com", "my-password")
+
+	// assertions
+    assert.NoError(t, err)
+    assert.Equal(t, "fake@email.com", token)
 }
